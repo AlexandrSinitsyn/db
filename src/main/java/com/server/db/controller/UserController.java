@@ -75,7 +75,39 @@ public class UserController {
             return Tools.errorsToResponse(bindingResult);
         }
 
+        //http://localhost:8090/api/1/connect?login=test&password=test
+        //http://localhost:8090/api/1/user/newName?login=test&password=test&newName=newTest
+        //http://localhost:8090/api/1/user/newName/confirm?login=test&password=test&newName=newTest
+
         return userService.updateName(userForm.toUser(userService), userForm.getPassword(), newName);
+    }
+
+    @PrivateOnly
+    @GetMapping("/user/newLogin/confirm")
+    public String ulConfirm(@Valid @ModelAttribute("userForm") final UserForm userForm,
+                          @RequestParam("newLogin") final String newLogin,
+                          final BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return Tools.errorsToResponse(bindingResult);
+        }
+
+        final User user = userForm.toUser(userService);
+        user.setAttached(userForm.getPassword());
+        return userService.updateLogin(user, userForm.getPassword(), newLogin);
+    }
+
+    @PrivateOnly
+    @GetMapping("/user/newName/confirm")
+    public String unConfirm(@Valid @ModelAttribute("userForm") final UserForm userForm,
+                            @RequestParam("newName") final String newName,
+                            final BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return Tools.errorsToResponse(bindingResult);
+        }
+
+        final User user = userForm.toUser(userService);
+        user.setAttached(userForm.getPassword());
+        return userService.updateName(user, userForm.getPassword(), newName);
     }
 
     @GetMapping("/findAll")
@@ -85,11 +117,6 @@ public class UserController {
 
     @GetMapping("/countUsers")
     public long countAll() {
-        final var user = new User();
-        user.setLogin("alexsin");
-        user.setName("alexsin");
-        user.setAdmin(true);
-        userService.updatePasswordSha(user, "1234");
         return userService.countAll();
     }
 

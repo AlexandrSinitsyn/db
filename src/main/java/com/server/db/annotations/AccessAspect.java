@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class AccessAspect {
     private final UserService userService;
-    private final Set<User> awaitUsers = ConcurrentHashMap.newKeySet();
+    private final Set<Long> awaitUsers = ConcurrentHashMap.newKeySet();
 
     @Pointcut("@annotation(confirmation)")
     public void awaitConfirmation(final Confirmation confirmation) {}
@@ -28,10 +28,14 @@ public class AccessAspect {
             throws Throwable {
         final User user = (User) joinPoint.getArgs()[0];
 
-        if (awaitUsers.contains(user)) {
+        if (user == null) {
+            return "unknown user";
+        }
+
+        if (awaitUsers.contains(user.getId())) {
             switch (confirmation.value()) {
                 case "password" -> {
-                    awaitUsers.remove(user);
+                    awaitUsers.remove(user.getId());
 
                     if (userService.findByLoginAndPassword(user.getLogin(), (String) user.getAttached()) == user) {
                         return joinPoint.proceed();
@@ -46,7 +50,7 @@ public class AccessAspect {
 
         switch (confirmation.value()) {
             case "password" -> {
-                awaitUsers.add(user);
+                awaitUsers.add(user.getId());
 
                 return "password";
             }
