@@ -1,5 +1,9 @@
 package com.server.db.annotations;
 
+import com.server.db.DbApplication;
+import com.server.db.Tools;
+import com.server.db.controller.ConnectionController;
+import com.server.db.controller.ErrorController;
 import com.server.db.domain.User;
 import com.server.db.form.UserForm;
 import com.server.db.service.UserService;
@@ -20,12 +24,23 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class AccessInterceptor implements HandlerInterceptor {
     private final UserService userService;
-    private static final String USER_ID_KEY = "userId";
 
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
         if (handler instanceof final HandlerMethod handlerMethod) {
             final Method method = handlerMethod.getMethod();
+
+            final Class<?> clazz = method.getDeclaringClass();
+            if (!clazz.getPackageName().startsWith(DbApplication.class.getPackageName()) ||
+                    method.getDeclaringClass().isAssignableFrom(ErrorController.class) ||
+                    method.getDeclaringClass().isAssignableFrom(ConnectionController.class)) {
+                return true;
+            }
+
+            if (request.getSession().getAttribute(Tools.USER_ID_KEY) == null) {
+                response.sendRedirect("/noUserId");
+                return false;
+            }
 
             final List<Class<? extends Annotation>> access = Arrays.stream(method.getDeclaredAnnotations())
                     .filter(a -> a.annotationType().getAnnotation(Access.class) != null)
@@ -39,20 +54,22 @@ public class AccessInterceptor implements HandlerInterceptor {
                 return false;
             }
 
-            if (access.contains(PrivateOnly.class)) {
-                final User user = userService.findById((Long) request.getSession().getAttribute(USER_ID_KEY));
+            final User user = getUserFromSession(request);
 
-                if (user.getId() == getUserIdFromRequest(request)) {
-                    return true;
-                }
-
+            if (user == null ||
+                    (access.contains(SystemOnly.class) && user.getId() != Tools.SYSTEM_USER_ID) ||
+                    (access.contains(Admin.class) && !user.isAdmin()) ||
+                    (access.contains(PrivateOnly.class) && user.getId() != getUserIdFromRequest(request))) {
                 response.sendRedirect("/accessDenied");
                 return false;
             }
-
         }
 
         return true;
+    }
+
+    private User getUserFromSession(final HttpServletRequest request) {
+        return userService.findById((Long) request.getSession().getAttribute(Tools.USER_ID_KEY));
     }
 
     private long getUserIdFromRequest(final HttpServletRequest request) {

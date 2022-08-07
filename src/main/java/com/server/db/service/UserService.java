@@ -1,5 +1,6 @@
 package com.server.db.service;
 
+import com.server.db.Tools;
 import com.server.db.annotations.*;
 import com.server.db.domain.User;
 import com.server.db.repository.UserRepository;
@@ -21,7 +22,6 @@ public class UserService {
         return userRepository.findAllByOrderByCreationTimeDesc();
     }
 
-    @NoOuterAccess
     public User findByLoginAndPassword(final String login, final String password) {
         return login == null || password == null ? null
                 : userRepository.findByLoginAndPassword(login, password);
@@ -31,36 +31,34 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
-    @Admin
     public void makeAdmin(final User user) {
         user.setAdmin(true);
         save(user);
     }
 
-    @Admin
     public void downgrade(final User user) {
         user.setAdmin(false);
         save(user);
     }
 
-    @SystemOnly
     public User save(final User user) {
         return userRepository.save(user);
     }
 
-    @PrivateOnly
     @Confirmation("password")
-    public void updateLogin(final User user, final String password, final String newLogin) {
+    public String updateLogin(final User user, final String password, final String newLogin) {
         userRepository.updateLogin(user.getId(), user.getLogin(), password, newLogin);
+
+        return Tools.SUCCESS_RESPONSE;
     }
 
-    @PrivateOnly
     @Confirmation("password")
-    public void updateName(final User user, final String password, final String newName) {
+    public String updateName(final User user, final String password, final String newName) {
         userRepository.updateName(user.getId(), user.getLogin(), password, newName);
+
+        return Tools.SUCCESS_RESPONSE;
     }
 
-    @NoOuterAccess
     public void updatePasswordSha(final User user, final String password) {
         userRepository.updatePasswordSha(user.getId(), user.getLogin(), password);
     }
@@ -73,10 +71,11 @@ public class UserService {
         return userRepository.count();
     }
 
-    @SystemOnly
     @Confirmation("action")
-    public void deleteById(final User user) {
+    public String deleteById(final User user) {
         userRepository.deleteById(user.getId());
+
+        return Tools.SUCCESS_RESPONSE;
     }
 
     public boolean isLoginVacant(final String login) {

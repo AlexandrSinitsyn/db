@@ -1,7 +1,9 @@
 package com.server.db.controller;
 
 import com.server.db.Tools;
+import com.server.db.annotations.Admin;
 import com.server.db.annotations.PrivateOnly;
+import com.server.db.annotations.SystemOnly;
 import com.server.db.domain.User;
 import com.server.db.form.UserForm;
 import com.server.db.form.validator.UserFormValidator;
@@ -26,83 +28,74 @@ public class UserController {
         binder.addValidators(userFormValidator);
     }
 
-    @GetMapping("allUsers")
+    @GetMapping("/allUsers")
     public List<User> findAll() {
         return userService.findAll();
     }
 
-    @PostMapping("registerUser")
-    public String register(@Valid @ModelAttribute("guestForm") final UserForm userForm,
-                         final BindingResult bindingResult) {
-        if (!userService.isLoginVacant(userForm.getLogin())) {
-            bindingResult.rejectValue("login", "is-already-in-use");
-        }
-
-        if (bindingResult.hasErrors()) {
-            return Tools.errorsToResponse(bindingResult);
-        }
-
-        final User user = userService.save(userForm.toUser(userService));
-
-        return Tools.userToJsonString(user);
+    @GetMapping("/logIn")
+    public User logIn(@Valid @ModelAttribute("userForm") final UserForm userForm) {
+        return userService.findByLoginAndPassword(userForm.getLogin(), userForm.getPassword());
     }
 
-    @GetMapping("logIn")
-    public User logIn(final String login, final String password) {
-        return login == null || password == null ? null
-                : userService.findByLoginAndPassword(login, password);
-    }
-
-    @GetMapping("user/{id}/makeAdmin")
-    public void makeAdmin(@PathVariable final long id) {
+    @Admin
+    @GetMapping("/user/{id}/makeAdmin")
+    public String makeAdmin(@PathVariable final long id) {
         userService.makeAdmin(userService.findById(id));
+
+        return Tools.SUCCESS_RESPONSE;
     }
 
-    @GetMapping("user/{id}/downgrade")
-    public void downgrade(@PathVariable final long id) {
+    @Admin
+    @GetMapping("/user/{id}/downgrade")
+    public String downgrade(@PathVariable final long id) {
         userService.downgrade(userService.findById(id));
+
+        return Tools.SUCCESS_RESPONSE;
     }
 
     @PrivateOnly
     @PostMapping("user/newLogin")
     public String updateLogin(@Valid @ModelAttribute("userForm") final UserForm userForm,
                               @RequestParam("newLogin") final String newLogin,
-                            final BindingResult bindingResult) {
+                              final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return Tools.errorsToResponse(bindingResult);
         }
 
-        userService.updateLogin(userForm.toUser(userService), userForm.getPassword(), newLogin);
-
-        return Tools.SUCCESS_RESPONSE;
+        return userService.updateLogin(userForm.toUser(userService), userForm.getPassword(), newLogin);
     }
 
     @PrivateOnly
     @PostMapping("user/newName")
     public String updateName(@Valid @ModelAttribute("userForm") final UserForm userForm,
-                             @RequestParam("newLogin") final String newName,
-                           final BindingResult bindingResult) {
+                             @RequestParam("newName") final String newName,
+                             final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return Tools.errorsToResponse(bindingResult);
         }
 
-        userService.updateName(userForm.toUser(userService), userForm.getPassword(), newName);
-
-        return Tools.SUCCESS_RESPONSE;
+        return userService.updateName(userForm.toUser(userService), userForm.getPassword(), newName);
     }
 
-    @GetMapping("findAll:login={login}")
-    public List<User> findAllByLogin(@PathVariable final String login) {
+    @GetMapping("/findAll")
+    public List<User> findAllByLogin(final String login) {
         return userService.findAllByLogin(login);
     }
 
-    @GetMapping("countUsers")
+    @GetMapping("/countUsers")
     public long countAll() {
+        final var user = new User();
+        user.setLogin("alexsin");
+        user.setName("alexsin");
+        user.setAdmin(true);
+        userService.updatePasswordSha(user, "1234");
         return userService.countAll();
     }
 
-    @GetMapping("deleteUser/{id}")
-    public void deleteById(@PathVariable final long id) {
-        userService.deleteById(userService.findById(id));
+    @SystemOnly
+    @GetMapping("/deleteUser/{id}")
+    public String deleteById(@PathVariable final long id) {
+        return userService.deleteById(userService.findById(id));
     }
 }
