@@ -30,7 +30,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "UPDATE server_user SET passwordSha=SHA1(CONCAT('1be3db47a7684152', ?2, ?3)) WHERE id=?1", nativeQuery = true)
     void updatePasswordSha(long id, String login, String password);
 
-    List<User> findAllByLogin(String login);
+    User findAllByLogin(String login);
 
     List<User> findAllByOrderByCreationTimeDesc();
 }

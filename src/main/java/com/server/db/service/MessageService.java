@@ -18,4 +18,12 @@ public class MessageService {
     public List<Message> findAll() {
         return messageRepository.findAll();
     }
+
+    public Message findById(final long id) {
+        return messageRepository.findById(id).orElse(null);
+    }
+
+    public Message save(final Message message) {
+        return messageRepository.save(message);
+    }
 }

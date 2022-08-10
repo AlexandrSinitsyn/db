@@ -31,6 +31,8 @@ public class Message {
     @Lob
     private String text;
 
+    private boolean unread;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;

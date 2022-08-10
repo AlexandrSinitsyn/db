@@ -1,7 +1,10 @@
 package com.server.db;
 
 import com.server.db.domain.User;
+import com.server.db.service.UserService;
 import org.springframework.validation.BindingResult;
+
+import javax.servlet.http.HttpSession;
 
 public final class Tools {
     public static final int SYSTEM_USER_ID = 1;
@@ -13,7 +16,7 @@ public final class Tools {
         return bindingResult.toString();
     }
 
-    public static String userToJsonString(final User user) {
-        return user.getLogin();
+    public static User getUserFromSession(final HttpSession session, final UserService userService) {
+        return userService.findById((Long) session.getAttribute(Tools.USER_ID_KEY));
     }
 }

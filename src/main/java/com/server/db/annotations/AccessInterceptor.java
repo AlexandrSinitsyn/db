@@ -54,7 +54,7 @@ public class AccessInterceptor implements HandlerInterceptor {
                 return false;
             }
 
-            final User user = getUserFromSession(request);
+            final User user = Tools.getUserFromSession(request.getSession(), userService);
 
             if (user == null ||
                     (access.contains(SystemOnly.class) && user.getId() != Tools.SYSTEM_USER_ID) ||
@@ -66,10 +66,6 @@ public class AccessInterceptor implements HandlerInterceptor {
         }
 
         return true;
-    }
-
-    private User getUserFromSession(final HttpServletRequest request) {
-        return userService.findById((Long) request.getSession().getAttribute(Tools.USER_ID_KEY));
     }
 
     private long getUserIdFromRequest(final HttpServletRequest request) {

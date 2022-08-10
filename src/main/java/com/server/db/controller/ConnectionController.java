@@ -55,6 +55,11 @@ public class ConnectionController {
         return Tools.SUCCESS_RESPONSE;
     }
 
+    @GetMapping("/logIn")
+    public User logIn(@Valid @ModelAttribute("userForm") final UserForm userForm) {
+        return userService.findByLoginAndPassword(userForm.getLogin(), userForm.getPassword());
+    }
+
     private void setUserToSession(final HttpServletRequest request, final User user) {
         request.getSession().setAttribute(Tools.USER_ID_KEY, user.getId());
     }

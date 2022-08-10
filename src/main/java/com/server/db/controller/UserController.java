@@ -28,14 +28,9 @@ public class UserController {
         binder.addValidators(userFormValidator);
     }
 
-    @GetMapping("/allUsers")
+    @GetMapping("/user/all")
     public List<User> findAll() {
         return userService.findAll();
-    }
-
-    @GetMapping("/logIn")
-    public User logIn(@Valid @ModelAttribute("userForm") final UserForm userForm) {
-        return userService.findByLoginAndPassword(userForm.getLogin(), userForm.getPassword());
     }
 
     @Admin
@@ -110,18 +105,18 @@ public class UserController {
         return userService.updateName(user, userForm.getPassword(), newName);
     }
 
-    @GetMapping("/findAll")
-    public List<User> findAllByLogin(final String login) {
-        return userService.findAllByLogin(login);
+    @GetMapping("/user/find")
+    public User findAllByLogin(final String login) {
+        return userService.findByLogin(login);
     }
 
-    @GetMapping("/countUsers")
+    @GetMapping("/user/count")
     public long countAll() {
         return userService.countAll();
     }
 
     @SystemOnly
-    @GetMapping("/deleteUser/{id}")
+    @GetMapping("/user/{id}/delete")
     public String deleteById(@PathVariable final long id) {
         return userService.deleteById(userService.findById(id));
     }

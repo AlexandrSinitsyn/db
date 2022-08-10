@@ -5,10 +5,7 @@ import com.server.db.annotations.*;
 import com.server.db.domain.User;
 import com.server.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -63,7 +60,7 @@ public class UserService {
         userRepository.updatePasswordSha(user.getId(), user.getLogin(), password);
     }
 
-    public List<User> findAllByLogin(final String login) {
+    public User findByLogin(final String login) {
         return userRepository.findAllByLogin(login);
     }
 
@@ -79,6 +76,6 @@ public class UserService {
     }
 
     public boolean isLoginVacant(final String login) {
-        return findAllByLogin(login).isEmpty();
+        return findByLogin(login) == null;
     }
 }

@@ -24,16 +24,40 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "chat")
-    @OrderBy("creationTime desc")
-    private List<Message> messages;
+    private String admin;
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
     @OrderBy("creationTime desc")
     private List<User> users;
 
+    @Transient
+    private List<String> logins;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "chat")
+    @OrderBy("creationTime desc")
+    private List<Message> messages;
+
     @CreationTimestamp
     private Date creationTime;
+
+    public void setUsers(final List<User> users) {
+        this.users = users;
+        this.logins = users.stream().map(User::getLogin).toList();
+    }
+
+    public void addUser(final User user) {
+        users.add(user);
+        logins.add(user.getLogin());
+    }
+
+    public void removeUser(final User user) {
+        users.remove(user);
+        logins.remove(user.getLogin());
+    }
+
+    public void addMessage(final Message message) {
+        messages.add(message);
+    }
 }
