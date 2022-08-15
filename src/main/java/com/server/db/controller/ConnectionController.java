@@ -5,6 +5,8 @@ import com.server.db.annotations.SystemOnly;
 import com.server.db.domain.User;
 import com.server.db.form.UserForm;
 import com.server.db.service.UserService;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +43,8 @@ public class ConnectionController {
     }
 
     @PutMapping("/connect")
+    @Operation(summary = "Provides connection to server. And sets this user 'id' to session",
+            description = "Send 'visitor=true' if this user is just a visitor or 'login=...&password=...' in the opposite case")
     public String connect(final HttpServletRequest request) {
         final User user;
         if (request.getParameter("visitor") != null) {
@@ -56,6 +60,7 @@ public class ConnectionController {
     }
 
     @GetMapping("/logIn")
+    @Deprecated(forRemoval = true)
     public User logIn(@Valid @ModelAttribute("userForm") final UserForm userForm) {
         return userService.findByLoginAndPassword(userForm.getLogin(), userForm.getPassword());
     }

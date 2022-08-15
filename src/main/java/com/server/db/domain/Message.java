@@ -1,5 +1,6 @@
 package com.server.db.domain;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,9 +19,11 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@Schema(description = "Message entity")
 public class Message implements DbEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private long id;
 
     @NotNull
@@ -44,6 +47,7 @@ public class Message implements DbEntity {
     private List<Message> links;
 
     @CreationTimestamp
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Date creationTime;
 
     @Override

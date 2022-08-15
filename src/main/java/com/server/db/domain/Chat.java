@@ -1,6 +1,7 @@
 package com.server.db.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,9 +18,11 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
+@Schema(description = "Chat entity")
 public class Chat implements DbEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private long id;
 
     private String admin;
@@ -38,11 +41,20 @@ public class Chat implements DbEntity {
     private List<Message> messages;
 
     @CreationTimestamp
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Date creationTime;
 
     public void setUsers(final List<User> users) {
         this.users = users;
         this.logins = users.stream().map(User::getLogin).toList();
+    }
+
+    public List<String> getLogins() {
+        if (logins.size() != users.size()) {
+            setUsers(users);
+        }
+
+        return logins;
     }
 
     public void addUser(final User user) {
