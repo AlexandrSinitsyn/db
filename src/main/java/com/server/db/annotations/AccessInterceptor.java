@@ -4,7 +4,6 @@ import com.server.db.DbApplication;
 import com.server.db.Tools;
 import com.server.db.controller.ConnectionController;
 import com.server.db.controller.ErrorController;
-import com.server.db.domain.DbEntity;
 import com.server.db.domain.User;
 import com.server.db.form.UserForm;
 import com.server.db.service.UserService;

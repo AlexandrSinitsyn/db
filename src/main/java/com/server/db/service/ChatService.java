@@ -4,7 +4,6 @@ import com.server.db.Tools;
 import com.server.db.annotations.Confirmation;
 import com.server.db.annotations.PrivateOnly;
 import com.server.db.domain.Chat;
-import com.server.db.domain.Chat;
 import com.server.db.repository.ChatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,7 @@ public class ChatService {
     private final ChatRepository chatRepository;
 
     public List<Chat> findAll() {
-        return chatRepository.findAll();
+        return chatRepository.findAllByOrderByCreationTimeDesc();
     }
 
     public Chat findById(final long id) {
