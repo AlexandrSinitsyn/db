@@ -73,7 +73,7 @@ public class ChatController {
         return chatService.save(chat);
     }
 
-    @PostMapping("/chat/{chatId}/addUser")
+    @PutMapping("/chat/{chatId}/addUser")
     public String addUserToChat(@PathVariable final long chatId,
                                 @RequestParam("login") final String login) {
         final Chat chat = chatService.findById(chatId);
@@ -83,7 +83,7 @@ public class ChatController {
         return Tools.SUCCESS_RESPONSE;
     }
 
-    @PostMapping("/chat/{chatId}/removeUser")
+    @PutMapping("/chat/{chatId}/removeUser")
     public String removeUserFromChat(@PathVariable final long chatId,
                                      @RequestParam("login") final String login) {
         final Chat chat = chatService.findById(chatId);
@@ -93,7 +93,7 @@ public class ChatController {
         return Tools.SUCCESS_RESPONSE;
     }
 
-    @PostMapping("/chat/{chatId}/delete")
+    @DeleteMapping("/chat/{chatId}/delete")
     public String deleteChat(@PathVariable final long chatId,
                              final HttpSession session) {
         final User user = Tools.getUserFromSession(session, userService);

@@ -40,7 +40,7 @@ public class ConnectionController {
         return user;
     }
 
-    @RequestMapping(value = "/connect", method = {RequestMethod.GET, RequestMethod.POST})
+    @PutMapping("/connect")
     public String connect(final HttpServletRequest request) {
         final User user;
         if (request.getParameter("visitor") != null) {

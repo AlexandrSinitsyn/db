@@ -48,7 +48,7 @@ public class MessageController {
         return messageService.save(message);
     }
 
-    @PostMapping("/message/{id}/rewrite")
+    @PutMapping("/message/{id}/rewrite")
     public String rewriteMessage(@PathVariable final long id,
                                  @Valid @ModelAttribute("messageForm") final MessageForm messageForm,
                                  final BindingResult bindingResult) {

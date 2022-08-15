@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @Admin
-    @GetMapping("/user/{id}/makeAdmin")
+    @PutMapping("/user/{id}/makeAdmin")
     public String makeAdmin(@PathVariable final long id) {
         userService.makeAdmin(userService.findById(id));
 
@@ -41,7 +41,7 @@ public class UserController {
     }
 
     @Admin
-    @GetMapping("/user/{id}/downgrade")
+    @PutMapping("/user/{id}/downgrade")
     public String downgrade(@PathVariable final long id) {
         userService.downgrade(userService.findById(id));
 
@@ -74,7 +74,7 @@ public class UserController {
         return userService.updateName(userForm.toUser(userService), userForm.getPassword(), newName);
     }
 
-    @GetMapping("/user/newLogin/confirm")
+    @PutMapping("/user/newLogin/confirm")
     public String ulConfirm(@Valid @ModelAttribute("userForm") final UserForm userForm,
                           @RequestParam("newLogin") final String newLogin,
                           final BindingResult bindingResult) {
@@ -87,7 +87,7 @@ public class UserController {
         return userService.updateLogin(user, userForm.getPassword(), newLogin);
     }
 
-    @GetMapping("/user/newName/confirm")
+    @PutMapping("/user/newName/confirm")
     public String unConfirm(@Valid @ModelAttribute("userForm") final UserForm userForm,
                             @RequestParam("newName") final String newName,
                             final BindingResult bindingResult) {
@@ -111,7 +111,7 @@ public class UserController {
     }
 
     @SystemOnly
-    @GetMapping("/user/{id}/delete")
+    @DeleteMapping("/user/{id}/delete")
     public String deleteById(@PathVariable final long id) {
         return userService.deleteById(userService.findById(id));
     }
