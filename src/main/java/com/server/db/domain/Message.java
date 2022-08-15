@@ -13,6 +13,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "server_message",
@@ -20,7 +21,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Message {
+public class Message implements DbEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -47,4 +48,9 @@ public class Message {
 
     @CreationTimestamp
     private Date creationTime;
+
+    @Override
+    public boolean checkPrivacy(final User user) {
+        return user != null && user.getId() == this.author.getId();
+    }
 }

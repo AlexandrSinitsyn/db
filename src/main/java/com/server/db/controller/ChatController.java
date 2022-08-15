@@ -2,7 +2,6 @@ package com.server.db.controller;
 
 import com.server.db.Tools;
 import com.server.db.annotations.NoOuterAccess;
-import com.server.db.annotations.PrivateOnly;
 import com.server.db.domain.Chat;
 import com.server.db.domain.Message;
 import com.server.db.domain.User;
@@ -59,17 +58,17 @@ public class ChatController {
         return getAllFromChat(id, count).stream().filter(Message::isUnread).toList();
     }
 
-    @PrivateOnly
     @PostMapping("/chat/create")
     public Chat createChat(@Valid @ModelAttribute("chatForm") final ChatForm chatForm,
-                           final BindingResult bindingResult) {
+                           final BindingResult bindingResult,
+                           final HttpSession session) {
         if (bindingResult.hasErrors()) {
             return null;
         }
 
         final var chat = new Chat();
         chat.setUsers(Arrays.stream(chatForm.getMemberName()).map(userService::findByLogin).toList());
-        chat.setAdmin(chatForm.getAdminName());
+        chat.setAdmin(Tools.getUserFromSession(session, userService).getLogin());
 
         return chatService.save(chat);
     }
@@ -94,7 +93,6 @@ public class ChatController {
         return Tools.SUCCESS_RESPONSE;
     }
 
-    @PrivateOnly
     @PostMapping("/chat/{chatId}/delete")
     public String deleteChat(@PathVariable final long chatId,
                              final HttpSession session) {

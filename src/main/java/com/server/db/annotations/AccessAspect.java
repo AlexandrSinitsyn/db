@@ -1,5 +1,7 @@
 package com.server.db.annotations;
 
+import com.server.db.Tools;
+import com.server.db.domain.DbEntity;
 import com.server.db.domain.User;
 import com.server.db.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +60,17 @@ public class AccessAspect {
                 return "confirm";
             }
             default -> throw new IllegalArgumentException("Unknown confirmation request");
+        }
+    }
+
+    @Around("@annotation(PrivateOnly)")
+    public Object handlerPrivateOnly(final ProceedingJoinPoint joinPoint) throws Throwable {
+        final DbEntity entity = (DbEntity) joinPoint.getArgs()[0];
+
+        if (entity.checkPrivacy(Tools.SESSION_USER)) {
+            return joinPoint.proceed();
+        } else {
+            return "redirect:/accessDenied";
         }
     }
 }

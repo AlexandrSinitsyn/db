@@ -9,9 +9,11 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "server_chat",
@@ -19,7 +21,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Chat {
+public class Chat implements DbEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -59,5 +61,10 @@ public class Chat {
 
     public void addMessage(final Message message) {
         messages.add(message);
+    }
+
+    @Override
+    public boolean checkPrivacy(final User user) {
+        return user != null && Objects.equals(user.getLogin(), admin);
     }
 }

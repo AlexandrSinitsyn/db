@@ -37,7 +37,6 @@ public class MessageController {
         return messageService.findAll();
     }
 
-    @PrivateOnly
     @PostMapping("/message/write")
     public Message writeMessage(@Valid @ModelAttribute("messageForm") final MessageForm messageForm,
                                final BindingResult bindingResult) {
@@ -50,7 +49,6 @@ public class MessageController {
         return messageService.save(message);
     }
 
-    @PrivateOnly
     @PostMapping("/message/{id}/rewrite")
     public String rewriteMessage(@PathVariable final long id,
                                  @Valid @ModelAttribute("messageForm") final MessageForm messageForm,

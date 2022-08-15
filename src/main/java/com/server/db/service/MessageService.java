@@ -1,5 +1,6 @@
 package com.server.db.service;
 
+import com.server.db.annotations.PrivateOnly;
 import com.server.db.domain.Message;
 import com.server.db.domain.User;
 import com.server.db.repository.MessageRepository;
@@ -23,6 +24,7 @@ public class MessageService {
         return messageRepository.findById(id).orElse(null);
     }
 
+    @PrivateOnly
     public Message save(final Message message) {
         return messageRepository.save(message);
     }

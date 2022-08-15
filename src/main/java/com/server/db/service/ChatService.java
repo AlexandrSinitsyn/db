@@ -2,6 +2,7 @@ package com.server.db.service;
 
 import com.server.db.Tools;
 import com.server.db.annotations.Confirmation;
+import com.server.db.annotations.PrivateOnly;
 import com.server.db.domain.Chat;
 import com.server.db.domain.Chat;
 import com.server.db.repository.ChatRepository;
@@ -28,6 +29,7 @@ public class ChatService {
         return chatRepository.save(chat);
     }
 
+    @PrivateOnly
     @Confirmation("action")
     public String deleteById(final Chat chat) {
         chatRepository.deleteById(chat.getId());

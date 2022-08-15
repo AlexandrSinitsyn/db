@@ -42,6 +42,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @PrivateOnly
     @Confirmation("password")
     public String updateLogin(final User user, final String password, final String newLogin) {
         userRepository.updateLogin(user.getId(), user.getLogin(), password, newLogin);
@@ -49,6 +50,7 @@ public class UserService {
         return Tools.SUCCESS_RESPONSE;
     }
 
+    @PrivateOnly
     @Confirmation("password")
     public String updateName(final User user, final String password, final String newName) {
         userRepository.updateName(user.getId(), user.getLogin(), password, newName);

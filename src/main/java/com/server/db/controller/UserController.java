@@ -49,7 +49,6 @@ public class UserController {
         return Tools.SUCCESS_RESPONSE;
     }
 
-    @PrivateOnly
     @PostMapping("user/newLogin")
     public String updateLogin(@Valid @ModelAttribute("userForm") final UserForm userForm,
                               @RequestParam("newLogin") final String newLogin,
@@ -61,7 +60,6 @@ public class UserController {
         return userService.updateLogin(userForm.toUser(userService), userForm.getPassword(), newLogin);
     }
 
-    @PrivateOnly
     @PostMapping("user/newName")
     public String updateName(@Valid @ModelAttribute("userForm") final UserForm userForm,
                              @RequestParam("newName") final String newName,
@@ -77,7 +75,6 @@ public class UserController {
         return userService.updateName(userForm.toUser(userService), userForm.getPassword(), newName);
     }
 
-    @PrivateOnly
     @GetMapping("/user/newLogin/confirm")
     public String ulConfirm(@Valid @ModelAttribute("userForm") final UserForm userForm,
                           @RequestParam("newLogin") final String newLogin,
@@ -91,7 +88,6 @@ public class UserController {
         return userService.updateLogin(user, userForm.getPassword(), newLogin);
     }
 
-    @PrivateOnly
     @GetMapping("/user/newName/confirm")
     public String unConfirm(@Valid @ModelAttribute("userForm") final UserForm userForm,
                             @RequestParam("newName") final String newName,

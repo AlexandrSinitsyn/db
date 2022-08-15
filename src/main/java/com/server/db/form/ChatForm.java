@@ -10,10 +10,5 @@ import javax.validation.constraints.Size;
 @Data
 public class ChatForm {
     @NotNull
-    @NotBlank
-    @Size(min = 2, max = 30)
-    @Pattern(regexp = "[a-zA-Z0-9_-]+")
-    private String adminName;
-
     private String[] memberName;
 }

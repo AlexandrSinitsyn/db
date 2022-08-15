@@ -19,7 +19,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User {
+public class User implements DbEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -54,4 +54,9 @@ public class User {
     @Transient
     @JsonIgnore
     private transient Object attached;
+
+    @Override
+    public boolean checkPrivacy(final User user) {
+        return user != null && user.id == this.id;
+    }
 }

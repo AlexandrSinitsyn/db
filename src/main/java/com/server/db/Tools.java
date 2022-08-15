@@ -7,10 +7,14 @@ import org.springframework.validation.BindingResult;
 import javax.servlet.http.HttpSession;
 
 public final class Tools {
-    public static final int SYSTEM_USER_ID = 1;
+    public static final long SYSTEM_USER_ID = 1;
     public static final int VISITOR_ID = -2;
     public static final String SUCCESS_RESPONSE = "success";
     public static final String USER_ID_KEY = "userId";
+
+    public static final boolean DEBUG = true;
+
+    public static User SESSION_USER = null;
 
     public static String errorsToResponse(final BindingResult bindingResult) {
         return bindingResult.toString();
