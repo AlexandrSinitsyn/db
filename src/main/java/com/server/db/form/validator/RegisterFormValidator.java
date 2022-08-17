@@ -1,6 +1,6 @@
 package com.server.db.form.validator;
 
-import com.server.db.form.UserForm;
+import com.server.db.form.RegisterForm;
 import com.server.db.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -9,20 +9,22 @@ import org.springframework.validation.Validator;
 
 @Component
 @RequiredArgsConstructor
-public class UserFormValidator implements Validator {
+public class RegisterFormValidator implements Validator {
     private final UserService userService;
 
     @Override
     public boolean supports(final Class<?> clazz) {
-        return UserForm.class.equals(clazz);
+        return RegisterForm.class.equals(clazz);
     }
 
     @Override
     public void validate(final Object target, final Errors errors) {
         if (!errors.hasErrors()) {
-            final UserForm registerForm = (UserForm) target;
+            final RegisterForm registerForm = (RegisterForm) target;
 
-            // to be extended
+            if (!userService.isLoginVacant(registerForm.getLogin())) {
+                errors.rejectValue("login", "is-already-in-use");
+            }
         }
     }
 }
