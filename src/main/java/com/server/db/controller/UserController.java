@@ -7,6 +7,7 @@ import com.server.db.domain.User;
 import com.server.db.form.UserForm;
 import com.server.db.form.validator.UserFormValidator;
 import com.server.db.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -50,7 +51,7 @@ public class UserController {
 
     @PostMapping("user/newLogin")
     public String updateLogin(@Valid @ModelAttribute("userForm") final UserForm userForm,
-                              @RequestParam("newLogin") final String newLogin,
+                              @RequestParam final String newLogin,
                               final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return Tools.errorsToResponse(bindingResult);
@@ -61,7 +62,7 @@ public class UserController {
 
     @PostMapping("user/newName")
     public String updateName(@Valid @ModelAttribute("userForm") final UserForm userForm,
-                             @RequestParam("newName") final String newName,
+                             @RequestParam final String newName,
                              final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return Tools.errorsToResponse(bindingResult);
@@ -75,9 +76,11 @@ public class UserController {
     }
 
     @PutMapping("/user/newLogin/confirm")
+    @Operation(summary = "request should be sent in order to confirm 'updateLogin'",
+            description = "send the same form (as for 'updateLogin'). It meant to ask user for confirmation his action")
     public String ulConfirm(@Valid @ModelAttribute("userForm") final UserForm userForm,
-                          @RequestParam("newLogin") final String newLogin,
-                          final BindingResult bindingResult) {
+                            @RequestParam final String newLogin,
+                            final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return Tools.errorsToResponse(bindingResult);
         }
@@ -88,8 +91,10 @@ public class UserController {
     }
 
     @PutMapping("/user/newName/confirm")
+    @Operation(summary = "request should be sent in order to confirm 'updateName'",
+            description = "send the same form (as for 'updateName'). It meant to ask user for confirmation his action")
     public String unConfirm(@Valid @ModelAttribute("userForm") final UserForm userForm,
-                            @RequestParam("newName") final String newName,
+                            @RequestParam final String newName,
                             final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return Tools.errorsToResponse(bindingResult);
@@ -112,6 +117,7 @@ public class UserController {
 
     @SystemOnly
     @DeleteMapping("/user/{id}/delete")
+    @Operation(summary = "this request would expect for confirmation, so it should be resent after confirmation")
     public String deleteById(@PathVariable final long id) {
         return userService.deleteById(userService.findById(id));
     }

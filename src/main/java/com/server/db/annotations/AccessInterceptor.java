@@ -67,7 +67,8 @@ public class AccessInterceptor implements HandlerInterceptor {
             final User user = Tools.getUserFromSession(request.getSession(), userService);
 
             if (user == null ||
-                    (access.contains(SystemOnly.class) && user.getId() != Tools.SYSTEM_USER_ID) ||
+                    (access.contains(SystemOnly.class) && request.getParameter(Tools.SYSTEM_PARAMETER) != null &&
+                            Objects.equals(request.getParameter(Tools.SYSTEM_ID_PARAMETER), Tools.SYSTEM_USER_ID + "")) ||
                     (access.contains(Admin.class) && !user.isAdmin())/* ||
                     (access.contains(PrivateOnly.class) && user.getId() != getUserIdFromRequest(request))*/) {
                 response.sendRedirect("/accessDenied");

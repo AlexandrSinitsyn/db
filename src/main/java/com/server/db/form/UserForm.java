@@ -11,7 +11,7 @@ public class UserForm {
     @NotNull
     @NotBlank
     @Size(min = 2, max = 30)
-    @Pattern(regexp = "[a-zA-Z0-9_-]+")
+    @Pattern(regexp = "[a-zA-Z0-9_-]{2,30}")
     private String login;
 
     @NotNull

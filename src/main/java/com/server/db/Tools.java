@@ -11,8 +11,10 @@ public final class Tools {
     public static final int VISITOR_ID = -2;
     public static final String SUCCESS_RESPONSE = "success";
     public static final String USER_ID_KEY = "userId";
+    public static final String SYSTEM_PARAMETER = "SYSTEM";
+    public static final String SYSTEM_ID_PARAMETER = "SYSTEM_ID";
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     public static User SESSION_USER = null;
 

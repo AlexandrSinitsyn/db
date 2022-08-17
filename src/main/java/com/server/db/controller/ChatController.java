@@ -75,7 +75,7 @@ public class ChatController {
 
     @PutMapping("/chat/{chatId}/addUser")
     public String addUserToChat(@PathVariable final long chatId,
-                                @RequestParam("login") final String login) {
+                                @RequestParam final String login) {
         final Chat chat = chatService.findById(chatId);
         chat.addUser(userService.findByLogin(login));
         chatService.save(chat);
@@ -85,7 +85,7 @@ public class ChatController {
 
     @PutMapping("/chat/{chatId}/removeUser")
     public String removeUserFromChat(@PathVariable final long chatId,
-                                     @RequestParam("login") final String login) {
+                                     @RequestParam final String login) {
         final Chat chat = chatService.findById(chatId);
         chat.removeUser(userService.findByLogin(login));
         chatService.save(chat);
