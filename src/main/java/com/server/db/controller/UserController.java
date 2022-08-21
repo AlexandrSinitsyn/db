@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/1")
@@ -29,7 +30,7 @@ public class UserController {
     }
 
     @GetMapping("/user/all")
-    public List<User> findAll() {
+    public CompletableFuture<List<User>> findAll() {
         return userService.findAll();
     }
 
@@ -50,22 +51,22 @@ public class UserController {
     }
 
     @PostMapping("user/newLogin")
-    public String updateLogin(@Valid @ModelAttribute("userForm") final UserForm userForm,
+    public CompletableFuture<String> updateLogin(@Valid @ModelAttribute("userForm") final UserForm userForm,
                               @RequestParam final String newLogin,
                               final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return Tools.errorsToResponse(bindingResult);
+            return CompletableFuture.completedFuture(Tools.errorsToResponse(bindingResult));
         }
 
         return userService.updateLogin(userForm.toUser(userService), userForm.getPassword(), newLogin);
     }
 
     @PostMapping("user/newName")
-    public String updateName(@Valid @ModelAttribute("userForm") final UserForm userForm,
+    public CompletableFuture<String> updateName(@Valid @ModelAttribute("userForm") final UserForm userForm,
                              @RequestParam final String newName,
                              final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return Tools.errorsToResponse(bindingResult);
+            return CompletableFuture.completedFuture(Tools.errorsToResponse(bindingResult));
         }
 
         //http://localhost:8090/api/1/connect?login=test&password=test
@@ -78,11 +79,11 @@ public class UserController {
     @PutMapping("/user/newLogin/confirm")
     @Operation(summary = "request should be sent in order to confirm 'updateLogin'",
             description = "send the same form (as for 'updateLogin'). It meant to ask user for confirmation his action")
-    public String ulConfirm(@Valid @ModelAttribute("userForm") final UserForm userForm,
+    public CompletableFuture<String> ulConfirm(@Valid @ModelAttribute("userForm") final UserForm userForm,
                             @RequestParam final String newLogin,
                             final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return Tools.errorsToResponse(bindingResult);
+            return CompletableFuture.completedFuture(Tools.errorsToResponse(bindingResult));
         }
 
         final User user = userForm.toUser(userService);
@@ -93,11 +94,11 @@ public class UserController {
     @PutMapping("/user/newName/confirm")
     @Operation(summary = "request should be sent in order to confirm 'updateName'",
             description = "send the same form (as for 'updateName'). It meant to ask user for confirmation his action")
-    public String unConfirm(@Valid @ModelAttribute("userForm") final UserForm userForm,
+    public CompletableFuture<String> unConfirm(@Valid @ModelAttribute("userForm") final UserForm userForm,
                             @RequestParam final String newName,
                             final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return Tools.errorsToResponse(bindingResult);
+            return CompletableFuture.completedFuture(Tools.errorsToResponse(bindingResult));
         }
 
         final User user = userForm.toUser(userService);
@@ -106,19 +107,19 @@ public class UserController {
     }
 
     @GetMapping("/user/find")
-    public User findAllByLogin(final String login) {
+    public CompletableFuture<User> findAllByLogin(final String login) {
         return userService.findByLogin(login);
     }
 
     @GetMapping("/user/count")
-    public long countAll() {
+    public CompletableFuture<Long> countAll() {
         return userService.countAll();
     }
 
     @SystemOnly
     @DeleteMapping("/user/{id}/delete")
     @Operation(summary = "this request would expect for confirmation, so it should be resent after confirmation")
-    public String deleteById(@PathVariable final long id) {
+    public CompletableFuture<String> deleteById(@PathVariable final long id) {
         return userService.deleteById(userService.findById(id));
     }
 }

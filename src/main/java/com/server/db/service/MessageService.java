@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("ClassCanBeRecord")
 @Service
@@ -14,16 +15,16 @@ import java.util.List;
 public class MessageService {
     private final MessageRepository messageRepository;
 
-    public List<Message> findAll() {
-        return messageRepository.findAllByOrderByCreationTimeDesc();
+    public CompletableFuture<List<Message>> findAll() {
+        return CompletableFuture.completedFuture(messageRepository.findAllByOrderByCreationTimeDesc());
     }
 
-    public Message findById(final long id) {
-        return messageRepository.findById(id).orElse(null);
+    public CompletableFuture<Message> findById(final long id) {
+        return CompletableFuture.completedFuture(messageRepository.findById(id).orElse(null));
     }
 
     @PrivateOnly
-    public Message save(final Message message) {
-        return messageRepository.save(message);
+    public CompletableFuture<Message> save(final Message message) {
+        return CompletableFuture.completedFuture(messageRepository.save(message));
     }
 }

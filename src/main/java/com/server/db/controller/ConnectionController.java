@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/1")
@@ -37,7 +38,7 @@ public class ConnectionController {
             return null;
         }
 
-        final User user = userService.save(registerForm.toUser());
+        final User user = userService.save(registerForm.toUser()).join();
         userService.updatePasswordSha(user, registerForm.getPassword());
 
         session.setAttribute(Tools.USER_ID_KEY, user.getId());
@@ -57,7 +58,7 @@ public class ConnectionController {
             user = new User();
             user.setId(Tools.VISITOR_ID);
         } else {
-            user = userService.findByLoginAndPassword(login, password);
+            user = userService.findByLoginAndPassword(login, password).join();
         }
 
         session.setAttribute(Tools.USER_ID_KEY, user.getId());
@@ -67,7 +68,7 @@ public class ConnectionController {
 
     @GetMapping("/logIn")
     @Deprecated(forRemoval = true)
-    public User logIn(@Valid @ModelAttribute("userForm") final UserForm userForm) {
+    public CompletableFuture<User> logIn(@Valid @ModelAttribute("userForm") final UserForm userForm) {
         return userService.findByLoginAndPassword(userForm.getLogin(), userForm.getPassword());
     }
 }

@@ -39,7 +39,7 @@ public class AccessAspect {
                 case "password" -> {
                     awaitUsers.remove(user.getId());
 
-                    if (userService.findByLoginAndPassword(user.getLogin(), (String) user.getAttached()) == user) {
+                    if (userService.findByLoginAndPassword(user.getLogin(), (String) user.getAttached()).join() == user) {
                         return joinPoint.proceed();
                     }
                 }

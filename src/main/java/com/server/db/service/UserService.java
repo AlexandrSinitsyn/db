@@ -5,9 +5,11 @@ import com.server.db.annotations.*;
 import com.server.db.domain.User;
 import com.server.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("ClassCanBeRecord")
 @Service
@@ -15,69 +17,80 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
 
-    public List<User> findAll() {
-        return userRepository.findAllByOrderByCreationTimeDesc();
+    @Async
+    public CompletableFuture<List<User>> findAll() {
+        return CompletableFuture.completedFuture(userRepository.findAllByOrderByCreationTimeDesc());
     }
 
-    public User findByLoginAndPassword(final String login, final String password) {
-        return login == null || password == null ? null
-                : userRepository.findByLoginAndPassword(login, password);
+    @Async
+    public CompletableFuture<User> findByLoginAndPassword(final String login, final String password) {
+        return CompletableFuture.completedFuture(login == null || password == null ? null
+                : userRepository.findByLoginAndPassword(login, password));
     }
 
     public User findById(final long id) {
         return userRepository.findById(id).orElse(null);
     }
 
+    @Async
     public void makeAdmin(final User user) {
         user.setAdmin(true);
-        save(user);
+        userRepository.save(user);
     }
 
+    @Async
     public void downgrade(final User user) {
         user.setAdmin(false);
-        save(user);
+        userRepository.save(user);
     }
 
-    public User save(final User user) {
-        return userRepository.save(user);
+    @Async
+    public CompletableFuture<User> save(final User user) {
+        return CompletableFuture.completedFuture(userRepository.save(user));
     }
 
+    @Async
     @PrivateOnly
     @Confirmation("password")
-    public String updateLogin(final User user, final String password, final String newLogin) {
+    public CompletableFuture<String> updateLogin(final User user, final String password, final String newLogin) {
         userRepository.updateLogin(user.getId(), user.getLogin(), password, newLogin);
 
-        return Tools.SUCCESS_RESPONSE;
+        return CompletableFuture.completedFuture(Tools.SUCCESS_RESPONSE);
     }
 
+    @Async
     @PrivateOnly
     @Confirmation("password")
-    public String updateName(final User user, final String password, final String newName) {
+    public CompletableFuture<String> updateName(final User user, final String password, final String newName) {
         userRepository.updateName(user.getId(), user.getLogin(), password, newName);
 
-        return Tools.SUCCESS_RESPONSE;
+        return CompletableFuture.completedFuture(Tools.SUCCESS_RESPONSE);
     }
 
+    @Async
     public void updatePasswordSha(final User user, final String password) {
         userRepository.updatePasswordSha(user.getId(), user.getLogin(), password);
     }
 
-    public User findByLogin(final String login) {
-        return userRepository.findAllByLogin(login);
+    @Async
+    public CompletableFuture<User> findByLogin(final String login) {
+        return CompletableFuture.completedFuture(userRepository.findAllByLogin(login));
     }
 
-    public long countAll() {
-        return userRepository.count();
+    @Async
+    public CompletableFuture<Long> countAll() {
+        return CompletableFuture.completedFuture(userRepository.count());
     }
 
+    @Async
     @Confirmation("action")
-    public String deleteById(final User user) {
+    public CompletableFuture<String> deleteById(final User user) {
         userRepository.deleteById(user.getId());
 
-        return Tools.SUCCESS_RESPONSE;
+        return CompletableFuture.completedFuture(Tools.SUCCESS_RESPONSE);
     }
 
     public boolean isLoginVacant(final String login) {
-        return findByLogin(login) == null;
+        return findByLogin(login).join() == null;
     }
 }

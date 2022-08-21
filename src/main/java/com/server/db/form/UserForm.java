@@ -27,6 +27,6 @@ public class UserForm {
     }
 
     public User toUser(final UserService userService) {
-        return userService.findByLoginAndPassword(login, password);
+        return userService.findByLoginAndPassword(login, password).join();
     }
 }

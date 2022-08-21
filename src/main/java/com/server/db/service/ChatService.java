@@ -6,9 +6,11 @@ import com.server.db.annotations.PrivateOnly;
 import com.server.db.domain.Chat;
 import com.server.db.repository.ChatRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("ClassCanBeRecord")
 @Service
@@ -16,23 +18,27 @@ import java.util.List;
 public class ChatService {
     private final ChatRepository chatRepository;
 
-    public List<Chat> findAll() {
-        return chatRepository.findAllByOrderByCreationTimeDesc();
+    @Async
+    public CompletableFuture<List<Chat>> findAll() {
+        return CompletableFuture.completedFuture(chatRepository.findAllByOrderByCreationTimeDesc());
     }
 
-    public Chat findById(final long id) {
-        return chatRepository.findById(id).orElse(null);
+    @Async
+    public CompletableFuture<Chat> findById(final long id) {
+        return CompletableFuture.completedFuture(chatRepository.findById(id).orElse(null));
     }
 
-    public Chat save(final Chat chat) {
-        return chatRepository.save(chat);
+    @Async
+    public CompletableFuture<Chat> save(final Chat chat) {
+        return CompletableFuture.completedFuture(chatRepository.save(chat));
     }
 
+    @Async
     @PrivateOnly
     @Confirmation("action")
-    public String deleteById(final Chat chat) {
+    public CompletableFuture<String> deleteById(final Chat chat) {
         chatRepository.deleteById(chat.getId());
 
-        return Tools.SUCCESS_RESPONSE;
+        return CompletableFuture.completedFuture(Tools.SUCCESS_RESPONSE);
     }
 }

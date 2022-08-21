@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/1")
@@ -32,12 +33,12 @@ public class MessageController {
 
     @NoOuterAccess
     @GetMapping("/message/all")
-    public List<Message> findAll() {
+    public CompletableFuture<List<Message>> findAll() {
         return messageService.findAll();
     }
 
     @PostMapping("/message/write")
-    public Message writeMessage(@Valid @ModelAttribute("messageForm") final MessageForm messageForm,
+    public CompletableFuture<Message> writeMessage(@Valid @ModelAttribute("messageForm") final MessageForm messageForm,
                                final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return null;
@@ -56,7 +57,7 @@ public class MessageController {
             return Tools.errorsToResponse(bindingResult);
         }
 
-        final Message message = messageService.findById(id);
+        final Message message = messageService.findById(id).join();
         final Message upd = messageForm.toMessage(userService, messageService, chatService);
 
         message.setText(upd.getText());

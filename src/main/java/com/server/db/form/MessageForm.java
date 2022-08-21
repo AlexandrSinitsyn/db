@@ -34,7 +34,7 @@ public class MessageForm {
             message.setText(text);
         }
 
-        message.setAuthor(userService.findByLogin(author));
+        message.setAuthor(userService.findByLogin(author).join());
         message.setChat(chatService.findById(chatId));
 
         if (links != null && !links.isEmpty()) {

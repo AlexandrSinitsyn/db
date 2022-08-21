@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/1")
@@ -36,7 +37,7 @@ public class ChatController {
 
     @NoOuterAccess
     @GetMapping("/chat/all")
-    public List<Chat> findAll() {
+    public CompletableFuture<List<Chat>> findAll() {
         return chatService.findAll();
     }
 
@@ -48,7 +49,7 @@ public class ChatController {
     @GetMapping("/chat/{id}/messages")
     public List<Message> getAllFromChat(@PathVariable final long id,
                                         @RequestParam final int count) {
-        final List<Message> res = chatService.findById(id).getMessages().stream().sorted(Comparator.comparing(Message::getCreationTime)).toList();
+        final List<Message> res = chatService.findById(id).join().getMessages().stream().sorted(Comparator.comparing(Message::getCreationTime)).toList();
         return res.subList(0, Math.min(res.size(), count));
     }
 
@@ -59,7 +60,7 @@ public class ChatController {
     }
 
     @PostMapping("/chat/create")
-    public Chat createChat(@Valid @ModelAttribute("chatForm") final ChatForm chatForm,
+    public CompletableFuture<Chat> createChat(@Valid @ModelAttribute("chatForm") final ChatForm chatForm,
                            final BindingResult bindingResult,
                            final HttpSession session) {
         if (bindingResult.hasErrors()) {
@@ -67,7 +68,7 @@ public class ChatController {
         }
 
         final var chat = new Chat();
-        chat.setUsers(Arrays.stream(chatForm.getMemberName()).map(userService::findByLogin).toList());
+        chat.setUsers(Arrays.stream(chatForm.getMemberName()).map(userService::findByLogin).map(CompletableFuture::join).toList());
         chat.setAdmin(Tools.getUserFromSession(session, userService).getLogin());
 
         return chatService.save(chat);
@@ -76,8 +77,8 @@ public class ChatController {
     @PutMapping("/chat/{chatId}/addUser")
     public String addUserToChat(@PathVariable final long chatId,
                                 @RequestParam final String login) {
-        final Chat chat = chatService.findById(chatId);
-        chat.addUser(userService.findByLogin(login));
+        final Chat chat = chatService.findById(chatId).join();
+        chat.addUser(userService.findByLogin(login).join());
         chatService.save(chat);
 
         return Tools.SUCCESS_RESPONSE;
@@ -86,21 +87,21 @@ public class ChatController {
     @PutMapping("/chat/{chatId}/removeUser")
     public String removeUserFromChat(@PathVariable final long chatId,
                                      @RequestParam final String login) {
-        final Chat chat = chatService.findById(chatId);
-        chat.removeUser(userService.findByLogin(login));
+        final Chat chat = chatService.findById(chatId).join();
+        chat.removeUser(userService.findByLogin(login).join());
         chatService.save(chat);
 
         return Tools.SUCCESS_RESPONSE;
     }
 
     @DeleteMapping("/chat/{chatId}/delete")
-    public String deleteChat(@PathVariable final long chatId,
+    public CompletableFuture<String> deleteChat(@PathVariable final long chatId,
                              final HttpSession session) {
         final User user = Tools.getUserFromSession(session, userService);
-        final Chat chat = chatService.findById(chatId);
+        final Chat chat = chatService.findById(chatId).join();
 
         if (user == null || !Objects.equals(user.getLogin(), chat.getAdmin())) {
-            return "redirect:/accessDenied";
+            return CompletableFuture.completedFuture("redirect:/accessDenied");
         }
 
         return chatService.deleteById(chat);
