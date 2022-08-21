@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Data
 public class MessageForm {
@@ -35,10 +36,10 @@ public class MessageForm {
         }
 
         message.setAuthor(userService.findByLogin(author).join());
-        message.setChat(chatService.findById(chatId));
+        message.setChat(chatService.findById(chatId).join());
 
         if (links != null && !links.isEmpty()) {
-            message.setLinks(links.stream().map(messageService::findById).toList());
+            message.setLinks(links.stream().map(messageService::findById).map(CompletableFuture::join).toList());
         }
 
         return message;
