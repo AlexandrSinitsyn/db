@@ -30,7 +30,10 @@ public class Chat implements DbEntity {
     private String admin;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "chats")
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "server_user_chats",
+            joinColumns = @JoinColumn(name = "chat_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
     @OrderBy("creationTime desc")
     private List<User> users;
 

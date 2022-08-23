@@ -48,15 +48,13 @@ public class ChatController {
 
     @GetMapping("/chat/{id}/users")
     public List<User> getChatUsers(@PathVariable final long id) {
-        final Chat chat = chatService.findById(id);
-        return Stream.concat(Stream.of(userService.findByLogin(chat.getAdmin())),
-                chat.getUsers().stream()).toList();
+        return chatService.findById(id).getUsers();
     }
 
     @GetMapping("/chat/{id}/messages")
     public List<Message> getAllFromChat(@PathVariable final long id,
                                         @RequestParam final int count) {
-        final List<Message> res = chatService.findById(id).getMessages().stream().sorted(Comparator.comparing(Message::getCreationTime)).toList();
+        final List<Message> res = chatService.findById(id).getMessages();
         return res.subList(0, Math.min(res.size(), count));
     }
 
@@ -68,7 +66,7 @@ public class ChatController {
 
     @PostMapping("/chat/create")
     public CompletableFuture<Chat> createChat(@Valid @RequestBody final ChatForm chatForm,
-                           final BindingResult bindingResult) {
+                                              final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
@@ -87,29 +85,35 @@ public class ChatController {
 
     @PutMapping("/chat/{id}/addUser")
     public void addUserToChat(@PathVariable final long id,
-                                @RequestParam final String login) {
+                              @RequestParam final String login) {
         final Chat chat = chatService.findById(id);
-        chat.addUser(userService.findByLogin(login));
+        final User user = userService.findByLogin(login);
+
+        if (chat.getUsers().contains(user)) {
+            return;
+        }
+
+        chat.addUser(user);
         chatService.save(chat);
     }
 
     @PutMapping("/chat/{id}/removeUser")
     public void removeUserFromChat(@PathVariable final long id,
-                                     @RequestParam final String login) {
+                                   @RequestParam final String login) {
         final Chat chat = chatService.findById(id);
+        final User user = userService.findByLogin(login);
+
+        if (!chat.getUsers().contains(user)) {
+            return;
+        }
+
         chat.removeUser(userService.findByLogin(login));
         chatService.save(chat);
     }
 
-    @DeleteMapping("/chat/{chatId}/delete")
-    public void deleteChat(@PathVariable final long chatId,
-                           @RequestParam final String jwt) {
-        final User user = jwtService.findUser(jwt);
-        final Chat chat = chatService.findById(chatId);
-
-        if (user == null || !Objects.equals(user.getLogin(), chat.getAdmin())) {
-            return;
-        }
+    @DeleteMapping("/chat/{id}/delete")
+    public void deleteChat(@PathVariable final long id) {
+        final Chat chat = chatService.findById(id);
 
         chatService.deleteById(chat);
     }

@@ -36,7 +36,7 @@ public class MessageController {
     }
 
     @PostMapping("/message/write")
-    public CompletableFuture<Message> writeMessage(@Valid @ModelAttribute("messageForm") final MessageForm messageForm,
+    public CompletableFuture<Message> writeMessage(@Valid @RequestBody final MessageForm messageForm,
                                                    final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
@@ -49,7 +49,7 @@ public class MessageController {
 
     @PutMapping("/message/{id}/rewrite")
     public void rewriteMessage(@PathVariable final long id,
-                               @Valid @ModelAttribute("messageForm") final MessageForm messageForm,
+                               @Valid @RequestBody final MessageForm messageForm,
                                final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);

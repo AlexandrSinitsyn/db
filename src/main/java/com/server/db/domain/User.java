@@ -47,10 +47,7 @@ public class User implements DbEntity {
     private List<Message> messages;
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "server_user_chats",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "chat_id"))
+    @ManyToMany(mappedBy = "users")
     @OrderBy("creationTime desc")
     private List<Chat> chats;
 
@@ -61,6 +58,11 @@ public class User implements DbEntity {
     @Transient
     @JsonIgnore
     private transient Object attached;
+
+    public User addChat(final Chat chat) {
+        chats.add(chat);
+        return this;
+    }
 
     @Override
     public boolean checkPrivacy(final User user) {
