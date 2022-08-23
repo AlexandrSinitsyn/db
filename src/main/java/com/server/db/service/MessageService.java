@@ -19,11 +19,10 @@ public class MessageService {
         return CompletableFuture.completedFuture(messageRepository.findAllByOrderByCreationTimeDesc());
     }
 
-    public CompletableFuture<Message> findById(final long id) {
-        return CompletableFuture.completedFuture(messageRepository.findById(id).orElse(null));
+    public Message findById(final long id) {
+        return messageRepository.findById(id).orElse(null);
     }
 
-    @PrivateOnly
     public CompletableFuture<Message> save(final Message message) {
         return CompletableFuture.completedFuture(messageRepository.save(message));
     }

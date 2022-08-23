@@ -1,7 +1,5 @@
 package com.server.db.service;
 
-import com.server.db.Tools;
-import com.server.db.annotations.*;
 import com.server.db.domain.User;
 import com.server.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -50,21 +48,13 @@ public class UserService {
     }
 
     @Async
-    @PrivateOnly
-    @Confirmation("password")
-    public CompletableFuture<String> updateLogin(final User user, final String password, final String newLogin) {
+    public void updateLogin(final User user, final String password, final String newLogin) {
         userRepository.updateLogin(user.getId(), user.getLogin(), password, newLogin);
-
-        return CompletableFuture.completedFuture(Tools.SUCCESS_RESPONSE);
     }
 
     @Async
-    @PrivateOnly
-    @Confirmation("password")
-    public CompletableFuture<String> updateName(final User user, final String password, final String newName) {
+    public void updateName(final User user, final String password, final String newName) {
         userRepository.updateName(user.getId(), user.getLogin(), password, newName);
-
-        return CompletableFuture.completedFuture(Tools.SUCCESS_RESPONSE);
     }
 
     @Async
@@ -72,9 +62,8 @@ public class UserService {
         userRepository.updatePasswordSha(user.getId(), user.getLogin(), password);
     }
 
-    @Async
-    public CompletableFuture<User> findByLogin(final String login) {
-        return CompletableFuture.completedFuture(userRepository.findAllByLogin(login));
+    public User findByLogin(final String login) {
+        return userRepository.findAllByLogin(login);
     }
 
     @Async
@@ -83,14 +72,11 @@ public class UserService {
     }
 
     @Async
-    @Confirmation("action")
-    public CompletableFuture<String> deleteById(final User user) {
+    public void deleteById(final User user) {
         userRepository.deleteById(user.getId());
-
-        return CompletableFuture.completedFuture(Tools.SUCCESS_RESPONSE);
     }
 
     public boolean isLoginVacant(final String login) {
-        return findByLogin(login).join() == null;
+        return findByLogin(login) == null;
     }
 }

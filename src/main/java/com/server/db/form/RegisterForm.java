@@ -1,7 +1,6 @@
 package com.server.db.form;
 
 import com.server.db.domain.User;
-import com.server.db.service.UserService;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -21,7 +20,7 @@ public class RegisterForm {
     @NotBlank
     @Size(min = 2, max = 30)
     @Pattern(regexp = "[a-zA-Z0-9_-]{2,30}")
-    final String name;
+    private String name;
 
     @NotNull
     @NotBlank

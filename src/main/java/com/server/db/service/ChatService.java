@@ -1,8 +1,5 @@
 package com.server.db.service;
 
-import com.server.db.Tools;
-import com.server.db.annotations.Confirmation;
-import com.server.db.annotations.PrivateOnly;
 import com.server.db.domain.Chat;
 import com.server.db.repository.ChatRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +20,8 @@ public class ChatService {
         return CompletableFuture.completedFuture(chatRepository.findAllByOrderByCreationTimeDesc());
     }
 
-    @Async
-    public CompletableFuture<Chat> findById(final long id) {
-        return CompletableFuture.completedFuture(chatRepository.findById(id).orElse(null));
+    public Chat findById(final long id) {
+        return chatRepository.findById(id).orElse(null);
     }
 
     @Async
@@ -34,11 +30,7 @@ public class ChatService {
     }
 
     @Async
-    @PrivateOnly
-    @Confirmation("action")
-    public CompletableFuture<String> deleteById(final Chat chat) {
+    public void deleteById(final Chat chat) {
         chatRepository.deleteById(chat.getId());
-
-        return CompletableFuture.completedFuture(Tools.SUCCESS_RESPONSE);
     }
 }

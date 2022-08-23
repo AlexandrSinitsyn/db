@@ -48,6 +48,9 @@ public class User implements DbEntity {
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "server_user_chats",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "chat_id"))
     @OrderBy("creationTime desc")
     private List<Chat> chats;
 

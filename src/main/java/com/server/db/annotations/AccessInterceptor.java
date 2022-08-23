@@ -24,76 +24,76 @@ import java.util.Objects;
 @Component
 @RequiredArgsConstructor
 public class AccessInterceptor implements HandlerInterceptor {
-    private final UserService userService;
-
-    @Override
-    public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
-        if (Tools.DEBUG) {
-            request.getSession().setAttribute(Tools.USER_ID_KEY, Tools.SYSTEM_USER_ID);
-        }
-
-        if (handler instanceof final HandlerMethod handlerMethod) {
-            final Method method = handlerMethod.getMethod();
-
-            final Class<?> clazz = method.getDeclaringClass();
-            if (!clazz.getPackageName().startsWith(DbApplication.class.getPackageName()) ||
-                    method.getDeclaringClass().isAssignableFrom(ErrorController.class) ||
-                    method.getDeclaringClass().isAssignableFrom(ConnectionController.class)) {
-                return true;
-            }
-
-            final List<Class<? extends Annotation>> access = Arrays.stream(method.getDeclaredAnnotations())
-                    .filter(a -> a.annotationType().getAnnotation(Access.class) != null)
-                    .<Class<? extends Annotation>>map(Annotation::annotationType).toList();
-
-            if (access.contains(NoOuterAccess.class)) {
-                response.sendRedirect("/accessDenied");
-                return false;
-            }
-
-            if (access.contains(Any.class)) {
-                return true;
-            }
-
-            if (request.getSession().getAttribute(Tools.USER_ID_KEY) == null) {
-                response.sendRedirect("/noUserId");
-                return false;
-            }
-
-            ///
-            Tools.SESSION_USER = Tools.getUserFromSession(request.getSession(), userService);
-            ///
-
-            final User user = Tools.getUserFromSession(request.getSession(), userService);
-
-            if (user == null ||
-                    (access.contains(SystemOnly.class) && request.getParameter(Tools.SYSTEM_PARAMETER) != null &&
-                            Objects.equals(request.getParameter(Tools.SYSTEM_ID_PARAMETER), Tools.SYSTEM_USER_ID + "")) ||
-                    (access.contains(Admin.class) && !user.isAdmin())/* ||
-                    (access.contains(PrivateOnly.class) && user.getId() != getUserIdFromRequest(request))*/) {
-                response.sendRedirect("/accessDenied");
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public void postHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler, final ModelAndView modelAndView) throws Exception {
-        HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
-
-        Tools.SESSION_USER = null;
-    }
-
-    private long getUserIdFromRequest(final HttpServletRequest request) {
-        try {
-            final UserForm userForm = new UserForm();
-            userForm.setLogin(Objects.requireNonNull(request.getParameter("login")));
-            userForm.setPassword(Objects.requireNonNull(request.getParameter("password")));
-            return userForm.toUser(userService).getId();
-        } catch (final NullPointerException e) {
-            return -1;
-        }
-    }
+    // private final UserService userService;
+    //
+    // @Override
+    // public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
+    //     if (Tools.DEBUG) {
+    //         request.getSession().setAttribute(Tools.USER_ID_KEY, Tools.SYSTEM_USER_ID);
+    //     }
+    //
+    //     if (handler instanceof final HandlerMethod handlerMethod) {
+    //         final Method method = handlerMethod.getMethod();
+    //
+    //         final Class<?> clazz = method.getDeclaringClass();
+    //         if (!clazz.getPackageName().startsWith(DbApplication.class.getPackageName()) ||
+    //                 method.getDeclaringClass().isAssignableFrom(ErrorController.class) ||
+    //                 method.getDeclaringClass().isAssignableFrom(ConnectionController.class)) {
+    //             return true;
+    //         }
+    //
+    //         final List<Class<? extends Annotation>> access = Arrays.stream(method.getDeclaredAnnotations())
+    //                 .filter(a -> a.annotationType().getAnnotation(Access.class) != null)
+    //                 .<Class<? extends Annotation>>map(Annotation::annotationType).toList();
+    //
+    //         if (access.contains(NoOuterAccess.class)) {
+    //             response.sendRedirect("/accessDenied");
+    //             return false;
+    //         }
+    //
+    //         if (access.contains(Any.class)) {
+    //             return true;
+    //         }
+    //
+    //         if (request.getSession().getAttribute(Tools.USER_ID_KEY) == null) {
+    //             response.sendRedirect("/noUserId");
+    //             return false;
+    //         }
+    //
+    //         ///
+    //         Tools.SESSION_USER = Tools.getUserFromSession(request.getSession(), userService);
+    //         ///
+    //
+    //         final User user = Tools.getUserFromSession(request.getSession(), userService);
+    //
+    //         if (user == null ||
+    //                 (access.contains(SystemOnly.class) && request.getParameter(Tools.SYSTEM_PARAMETER) != null &&
+    //                         Objects.equals(request.getParameter(Tools.SYSTEM_ID_PARAMETER), Tools.SYSTEM_USER_ID + "")) ||
+    //                 (access.contains(Admin.class) && !user.isAdmin())/* ||
+    //                 (access.contains(PrivateOnly.class) && user.getId() != getUserIdFromRequest(request))*/) {
+    //             response.sendRedirect("/accessDenied");
+    //             return false;
+    //         }
+    //     }
+    //
+    //     return true;
+    // }
+    //
+    // @Override
+    // public void postHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler, final ModelAndView modelAndView) throws Exception {
+    //     HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
+    //
+    //     Tools.SESSION_USER = null;
+    // }
+    //
+    // private long getUserIdFromRequest(final HttpServletRequest request) {
+    //     try {
+    //         final UserForm userForm = new UserForm();
+    //         userForm.setLogin(Objects.requireNonNull(request.getParameter("login")));
+    //         userForm.setPassword(Objects.requireNonNull(request.getParameter("password")));
+    //         return userForm.toUser(userService).getId();
+    //     } catch (final NullPointerException e) {
+    //         return -1;
+    //     }
+    // }
 }

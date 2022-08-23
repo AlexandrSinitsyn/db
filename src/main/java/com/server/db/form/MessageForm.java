@@ -2,6 +2,7 @@ package com.server.db.form;
 
 import com.server.db.domain.Message;
 import com.server.db.service.ChatService;
+import com.server.db.service.JwtService;
 import com.server.db.service.MessageService;
 import com.server.db.service.UserService;
 import lombok.Data;
@@ -15,31 +16,29 @@ import java.util.concurrent.CompletableFuture;
 
 @Data
 public class MessageForm {
+    @NotNull
+    @NotBlank
+    private String jwt;
+
     private String text;
 
     @NotNull
     private long chatId;
 
-    @NotNull
-    @NotBlank
-    @Size(min = 2, max = 30)
-    @Pattern(regexp = "[a-zA-Z0-9_-]{2,30}")
-    private String author;
-
     private List<Integer> links;
 
-    public Message toMessage(final UserService userService, final MessageService messageService, final ChatService chatService) {
+    public Message toMessage(final JwtService jwtService, final MessageService messageService, final ChatService chatService) {
         final Message message = new Message();
 
         if (text != null && !text.isBlank()) {
             message.setText(text);
         }
 
-        message.setAuthor(userService.findByLogin(author).join());
-        message.setChat(chatService.findById(chatId).join());
+        message.setAuthor(jwtService.findUser(jwt));
+        message.setChat(chatService.findById(chatId));
 
         if (links != null && !links.isEmpty()) {
-            message.setLinks(links.stream().map(messageService::findById).map(CompletableFuture::join).toList());
+            message.setLinks(links.stream().map(messageService::findById).toList());
         }
 
         return message;

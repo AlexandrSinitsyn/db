@@ -1,13 +1,12 @@
 package com.server.db.controller;
 
-import com.server.db.Tools;
-import com.server.db.annotations.NoOuterAccess;
 import com.server.db.domain.Message;
+import com.server.db.exceptions.ValidationException;
 import com.server.db.form.MessageForm;
 import com.server.db.form.validator.MessageFormValidator;
 import com.server.db.service.ChatService;
+import com.server.db.service.JwtService;
 import com.server.db.service.MessageService;
-import com.server.db.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -21,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/api/1")
 @RequiredArgsConstructor
 public class MessageController {
-    private final UserService userService;
+    private final JwtService jwtService;
     private final MessageService messageService;
     private final ChatService chatService;
     private final MessageFormValidator messageFormValidator;
@@ -31,7 +30,6 @@ public class MessageController {
         binder.addValidators(messageFormValidator);
     }
 
-    @NoOuterAccess
     @GetMapping("/message/all")
     public CompletableFuture<List<Message>> findAll() {
         return messageService.findAll();
@@ -39,32 +37,30 @@ public class MessageController {
 
     @PostMapping("/message/write")
     public CompletableFuture<Message> writeMessage(@Valid @ModelAttribute("messageForm") final MessageForm messageForm,
-                               final BindingResult bindingResult) {
+                                                   final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return null;
+            throw new ValidationException(bindingResult);
         }
 
-        final Message message = messageForm.toMessage(userService, messageService, chatService);
+        final Message message = messageForm.toMessage(jwtService, messageService, chatService);
 
         return messageService.save(message);
     }
 
     @PutMapping("/message/{id}/rewrite")
-    public String rewriteMessage(@PathVariable final long id,
-                                 @Valid @ModelAttribute("messageForm") final MessageForm messageForm,
-                                 final BindingResult bindingResult) {
+    public void rewriteMessage(@PathVariable final long id,
+                               @Valid @ModelAttribute("messageForm") final MessageForm messageForm,
+                               final BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return Tools.errorsToResponse(bindingResult);
+            throw new ValidationException(bindingResult);
         }
 
-        final Message message = messageService.findById(id).join();
-        final Message upd = messageForm.toMessage(userService, messageService, chatService);
+        final Message message = messageService.findById(id);
+        final Message upd = messageForm.toMessage(jwtService, messageService, chatService);
 
         message.setText(upd.getText());
         message.setLinks(upd.getLinks());
 
         messageService.save(message);
-
-        return Tools.SUCCESS_RESPONSE;
     }
 }

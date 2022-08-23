@@ -35,3 +35,4 @@ build/
 
 ### Private keys ###
 src/main/resources/application.properties
+src/main/resources/private-keys.properties
