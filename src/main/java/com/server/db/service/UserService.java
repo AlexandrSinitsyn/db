@@ -1,5 +1,6 @@
 package com.server.db.service;
 
+import com.server.db.annotations.Confirmation;
 import com.server.db.domain.User;
 import com.server.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -72,6 +73,7 @@ public class UserService {
     }
 
     @Async
+    @Confirmation("action")
     public void deleteById(final User user) {
         userRepository.deleteById(user.getId());
     }

@@ -19,13 +19,6 @@ public class UserForm {
     @Size(min = 1, max = 60)
     private String password;
 
-    public User toUser(final String name) {
-        final var user = new User();
-        user.setLogin(login);
-        user.setName(name);
-        return user;
-    }
-
     public User toUser(final UserService userService) {
         return userService.findByLoginAndPassword(login, password).join();
     }

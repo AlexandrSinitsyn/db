@@ -55,15 +55,6 @@ public class User implements DbEntity {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Date creationTime;
 
-    @Transient
-    @JsonIgnore
-    private transient Object attached;
-
-    public User addChat(final Chat chat) {
-        chats.add(chat);
-        return this;
-    }
-
     @Override
     public boolean checkPrivacy(final User user) {
         return user != null && user.id == this.id;

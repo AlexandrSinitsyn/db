@@ -1,25 +1,16 @@
 package com.server.db.form;
 
+import com.server.db.annotations.AccessInterceptor;
 import com.server.db.domain.Message;
 import com.server.db.service.ChatService;
-import com.server.db.service.JwtService;
 import com.server.db.service.MessageService;
-import com.server.db.service.UserService;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Data
 public class MessageForm {
-    @NotNull
-    @NotBlank
-    private String jwt;
-
     private String text;
 
     @NotNull
@@ -27,14 +18,14 @@ public class MessageForm {
 
     private List<Integer> links;
 
-    public Message toMessage(final JwtService jwtService, final MessageService messageService, final ChatService chatService) {
+    public Message toMessage(final MessageService messageService, final ChatService chatService) {
         final Message message = new Message();
 
         if (text != null && !text.isBlank()) {
             message.setText(text);
         }
 
-        message.setAuthor(jwtService.findUser(jwt));
+        message.setAuthor(AccessInterceptor.sUser.getUser());
         message.setChat(chatService.findById(chatId));
 
         if (links != null && !links.isEmpty()) {

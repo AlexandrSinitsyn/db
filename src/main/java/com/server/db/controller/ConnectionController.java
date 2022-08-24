@@ -87,7 +87,7 @@ public class ConnectionController {
     }
 
     @GetMapping("users/auth")
-    public User findUserByJwt(@RequestParam String jwt) {
+    public User findUserByJwt(@RequestHeader String jwt) {
         return jwtService.findUser(jwt);
     }
 
